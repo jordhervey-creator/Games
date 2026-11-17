@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sight Word Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#eef7ff;font-family:'Fredoka',system-ui,sans-serif;color:#222;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{max-width:900px;margin:0 auto;padding:18px 18px 40px}
+h1{font-size:clamp(34px,6vw,56px);text-align:center;margin:6px 0;color:#5a3fc0}
+h2{font-size:28px;text-align:center;margin:8px 0;color:#5a3fc0}
+.sub{text-align:center;font-size:22px;margin:4px 0 14px}
+.w{font-family:'Andika',sans-serif}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.iconbtn{width:72px;height:72px;border-radius:50%;border:none;background:#fff;box-shadow:0 5px 0 #c9d8ea;font-size:34px;cursor:pointer;flex-shrink:0}
+.top .t{font-size:26px;font-weight:700;text-align:center}
+.card{background:#fff;border-radius:30px;padding:22px;text-align:center;box-shadow:0 8px 0 #c9d8ea}
+.btn{border:none;border-radius:24px;padding:16px 26px;font:inherit;font-size:26px;font-weight:700;cursor:pointer;min-width:120px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.btn:active,.iconbtn:active,.space:active,.wc:active,.tile:active,.sw:active{transform:translateY(4px)}
+.btn.sm{font-size:18px;padding:10px 16px;min-width:0;border-radius:16px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.green{background:#2a9d4b;color:#fff}.red{background:#e63946;color:#fff}.yellow{background:#ffc93c;color:#222}.white{background:#fff;color:#222}.blue{background:#3a86ff;color:#fff}.purple{background:#7b5ce0;color:#fff}.gray{background:#ddd;color:#555}
+.huge{font-size:34px;padding:22px 30px;min-width:200px}
+.row{display:flex;gap:14px;justify-content:center;margin-top:18px;flex-wrap:wrap;align-items:center}
+.bigword{font-family:'Andika',sans-serif;font-size:clamp(90px,18vw,170px);font-weight:700;line-height:1.1;margin:10px 0;color:#222}
+.ask{font-size:28px;color:#5a3fc0;font-weight:700}
+.sentence{font-size:clamp(26px,4vw,36px);margin:10px 0}
+.sentence b{color:#e63946;font-family:'Andika',sans-serif}
+.letters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+.letter{font-family:'Andika',sans-serif;font-size:56px;font-weight:700;width:84px;height:96px;border-radius:20px;border:none;background:#fff3c4;box-shadow:0 5px 0 #e6cf7a;cursor:pointer;color:#222}
+.dots{display:flex;gap:8px;justify-content:center;margin:4px 0 12px;flex-wrap:wrap}
+.dot{width:18px;height:18px;border-radius:50%;background:#c9d8ea}.dot.on{background:#ffc93c}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.wc{font-family:'Andika',sans-serif;font-size:clamp(48px,9vw,80px);font-weight:700;background:#fff;border:6px solid transparent;border-radius:26px;padding:22px 0;cursor:pointer;box-shadow:0 6px 0 #c9d8ea;color:#222}
+.wc.right{border-color:#2a9d4b;background:#e5f8ea}
+.wc.wrong{opacity:.35;animation:shake .4s}
+.hunt{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.hunt .wc{font-size:clamp(28px,5.5vw,46px);padding:22px 0}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.slots{display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+.slot{font-family:'Andika',sans-serif;width:80px;height:94px;border-radius:18px;border:4px dashed #b8a8f0;font-size:56px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff}
+.slot.ghost{color:#d6cdf7}
+.slot.fill{border-style:solid;border-color:#2a9d4b;background:#e5f8ea;color:#222}
+.tiles{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.tile{font-family:'Andika',sans-serif;font-size:56px;font-weight:700;width:86px;height:96px;border:none;border-radius:20px;background:#7b5ce0;color:#fff;box-shadow:0 6px 0 #5a3fc0;cursor:pointer}
+.tile.used{visibility:hidden}
+.tile.wrong{animation:shake .4s}
+/* sentence reading */
+.sread{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin:16px 0}
+.sw{font-family:'Andika',sans-serif;font-size:clamp(40px,7vw,64px);font-weight:700;background:none;border:none;border-bottom:4px solid transparent;padding:2px 4px;cursor:pointer;color:#222}
+.sw.tw{color:#5a3fc0}
+.sw.helped{border-bottom-color:#ffc93c}
+/* writing */
+.starter{font-family:'Andika',sans-serif;font-size:clamp(34px,6vw,54px);font-weight:700;margin:14px 0;padding:14px;border-radius:20px;background:#fffbea;border:3px dashed #e6cf7a}
+.checks{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.checks button{font:inherit;font-size:20px;font-weight:600;border:3px solid #c9d8ea;border-radius:18px;background:#fff;padding:10px 14px;cursor:pointer;color:#222}
+.checks button.on{border-color:#2a9d4b;background:#e5f8ea}
+/* board */
+.header{background:#fff;border-radius:26px;padding:14px 18px;box-shadow:0 6px 0 #c9d8ea;text-align:center}
+.weekwords{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.chip{font-family:'Andika',sans-serif;font-size:40px;font-weight:700;background:#fff3c4;border:none;border-radius:18px;padding:6px 22px;cursor:pointer;color:#222;box-shadow:0 4px 0 #e6cf7a}
+.board{position:relative;margin:18px 0 6px}
+.board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.space{position:absolute;transform:translate(-50%,-50%);width:146px;height:146px;border-radius:50%;border:none;background:#fff;box-shadow:0 7px 0 #c9d8ea;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font:inherit;color:#222}
+.space .ic{font-size:52px;line-height:1}
+.space .nm{font-size:17px;font-weight:600;margin-top:4px;max-width:120px;line-height:1.1}
+.space.done{background:#e5f8ea}
+.space.cur{background:#ffc93c;box-shadow:0 7px 0 #d9a21a;animation:bob 1.6s ease-in-out infinite}
+.space.lock{opacity:.5}
+.space .tag{position:absolute;top:-6px;right:-4px;font-size:30px}
+.token{position:absolute;transform:translate(-50%,-50%);font-size:62px;pointer-events:none;z-index:2;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))}
+@keyframes bob{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-56%)}}
+.avatars{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+.avatars button{font-size:80px;background:#fff;border:none;border-radius:26px;padding:12px 0;box-shadow:0 6px 0 #c9d8ea;cursor:pointer}
+.jar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.jar .chip{font-size:30px;background:#e5f8ea;box-shadow:0 4px 0 #a9dcb8}
+/* grown-up screens */
+.grown{background:#fff;border-radius:20px;padding:16px 20px;font-size:18px;line-height:1.5;margin-top:16px;user-select:text;-webkit-user-select:text}
+.grown h3{margin:4px 0 8px;font-size:22px;color:#5a3fc0}
+.pick{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.pick button{font-family:'Andika',sans-serif;font-size:26px;font-weight:700;border:3px solid #c9d8ea;background:#fff;border-radius:16px;padding:8px 16px;cursor:pointer;color:#222;text-align:center}
+.pick button small{display:block;font-family:'Fredoka',sans-serif;font-size:13px;font-weight:400;color:#678}
+.pick button.on{border-color:#7b5ce0;background:#efeaff}
+.wl{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.wl span,.wl button{font-family:'Andika',sans-serif;font-size:20px;padding:4px 12px;border-radius:12px;background:#c8f0d3;border:none;color:#222}
+.wl button{cursor:pointer}
+.wl .flag{background:#ffd3d8}
+.sline{font-family:'Andika',sans-serif;font-size:22px;padding:6px 10px;border-radius:10px;background:#f4f7fb;margin:6px 0}
+.bad{background:#ffd3d8;border-radius:6px;padding:0 3px}
+.toggles label{display:flex;align-items:center;gap:10px;font-size:19px;margin:6px 0}
+.toggles input{width:26px;height:26px}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:18px;border-radius:12px;padding:10px;border:2px solid #c9d8ea;user-select:text;-webkit-user-select:text;background:#fff}
+textarea{font-size:15px}
+.fld{margin:8px 0}
+.fld label{font-weight:600;display:block;margin-bottom:4px}
+.hint{font-size:15px;color:#678}
+.gtag{display:inline-block;background:#ffe0e3;color:#a4161a;border-radius:999px;padding:4px 14px;font-size:18px;font-weight:600}
+.small{font-size:18px;color:#567}
+.grownbar{text-align:center;margin-top:20px}
+.grownbar button{background:none;border:2px solid #b8c9de;color:#567;border-radius:14px;padding:10px 18px;font:inherit;font-size:18px;cursor:pointer}
+table.hist{width:100%;border-collapse:collapse;font-size:16px}
+table.hist td,table.hist th{border-bottom:1px solid #e3eaf3;padding:6px;text-align:left;vertical-align:top}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+.cf{position:absolute;top:-30px;width:14px;height:22px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(800deg)}}
+.pop{animation:pop .45s}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="confetti"></div>
+<script>
+/* =========================================================
+   STARTING POINT (built in, so it's never lost)
+   ========================================================= */
+const START_MASTERED = ["one","two","three","the","a","blue","yellow","look","I","are","little","down","out","of","up","funny","all","from","was","when","why","to","where","no","what","so","which","once","he","she","we","be","me","my","by","you","your"];
+const START_LEARNING = ["word","said","says","were","here","there","they","their"];
+
+/* Built-in word info: a teaching sentence (read aloud by the game) and a writing prompt */
+const INFO = {
+  word:{s:"Can you read this word?", p:"What is a word you love? Write it in a sentence!", st:"My word is ___."},
+  said:{s:"Mom said yes!", p:"What did someone say to you today?", st:"Mom said ___."},
+  says:{s:"The cow says moo.", p:"What does an animal say? Pick one!", st:"A dog says ___."},
+  were:{s:"We were at the park.", p:"Where were you today?", st:"We were at ___."},
+  here:{s:"Come here, please.", p:"Look around your room. What is here?", st:"Here is my ___."},
+  there:{s:"The ball is over there.", p:"Look out the window. What is there?", st:"There is a ___."},
+  they:{s:"They are playing.", p:"Think of two friends. What are they like?", st:"They are ___."},
+  their:{s:"The kids got their coats.", p:"Think of a family you know. What do they have?", st:"Their ___ is ___."},
+  // mastered words (used when she needs a reminder)
+  one:{s:"I have one nose."}, two:{s:"I have two hands."}, three:{s:"I see three dogs."}, the:{s:"The cat is big."}, a:{s:"I see a dog."},
+  blue:{s:"The sky is blue."}, yellow:{s:"The sun is yellow."}, look:{s:"Look at me!"}, I:{s:"I can jump."}, are:{s:"We are friends."},
+  little:{s:"The bug is little."}, down:{s:"Sit down, please."}, out:{s:"Let's go out to play."}, of:{s:"I want a cup of milk."}, up:{s:"Jump up high!"},
+  funny:{s:"The clown is funny."}, all:{s:"We all like cake."}, from:{s:"This card is from Mom."}, was:{s:"The dog was happy."}, when:{s:"When can we go?"},
+  why:{s:"Why is the sky blue?"}, to:{s:"I want to play."}, where:{s:"Where is my shoe?"}, no:{s:"No, thank you."},
+  what:{s:"What is your name?"}, so:{s:"I am so happy!"}, which:{s:"Which one do you want?"}, once:{s:"Once upon a time."},
+  he:{s:"He is my friend."}, she:{s:"She can run fast."}, we:{s:"We like to dance."}, be:{s:"Be kind!"}, me:{s:"Give it to me."},
+  my:{s:"This is my dog."}, by:{s:"Sit by me."}, you:{s:"I love you!"}, your:{s:"Is this your hat?"}
+};
+
+/* Reading sentences: only her sight words + short sound-it-out (CVC) words.
+   The game automatically skips any sentence with a word she hasn't learned yet. */
+const BANK = [
+  "What is the word?","Which word is red?","Look at the big word!","Is the word on the map?",
+  "Mom said yes!","He said no.","She said the pig is so funny.","Dad said to sit up.",
+  "The hen says, \"Get up!\"","Mom says it is hot.","Dad says, \"Hop in bed!\"","He says the cat is on the rug.",
+  "We were in the sun.","You were so funny!","Where were you?","Were you in bed?",
+  "Sit here!","The bug is here.","Here is my red hat.","Hop up here, pup!",
+  "Look! The dog is there.","There is a fox in the box!","Is the bus there yet?","There was a big bug.",
+  "They are so funny!","They had fun in the sun.","Where are they?","They sat on the rug.",
+  "Their dog is big.","They sat on their bed.","Their cat got wet.","Where is their red bus?",
+  "They said, \"Look here!\"","Mom says they were here.","Their dog was here, but it ran!","Where were they? They were in bed.",
+  "He said the bug is there.","There is the word!","She says their cat is little.","Here is their hat.",
+  "Look up at the sun!","Where is my hat?","You are so funny!","Which one is blue?","Once a pig sat in the mud.","The little fox was sad."
+];
+
+const PARTNER = {to:"two", two:"to", there:"their", their:"there"};
+const AVATARS = ["🦄","🐶","🐱","🦊","🐸","🐼","🐯","🐰"];
+
+/* =========================================================
+   SAVED DATA (on this device)
+   ========================================================= */
+const KEY = "sightWords_v2";
+let S = null;
+function fresh(){
+  return {avatar:null, mastered:[...START_MASTERED], learning:[...START_LEARNING], custom:{}, stats:{}, flags:[],
+          today:null, history:[], voiceURI:null, lastCheckup:null};
+}
+try{ const s = localStorage.getItem(KEY); S = s ? Object.assign(fresh(), JSON.parse(s)) : fresh(); }catch(e){ S = fresh(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const todayStr = () => new Date().toLocaleDateString("en-CA");
+const daysSince = d => d ? Math.floor((new Date(todayStr()) - new Date(d)) / 864e5) : null;
+const info = w => S.custom[w] || INFO[w] || {s:`This word is ${w}.`};
+const lc = w => w.toLowerCase();
+
+/* =========================================================
+   VOICE (prefers Ava Enhanced)
+   ========================================================= */
+let voice = null, voices = [];
+function loadVoices(){
+  try{
+    voices = speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+    const fancy = v => /enhanced|premium/i.test(v.name + " " + v.voiceURI);
+    voice = (S.voiceURI && voices.find(v=>v.voiceURI===S.voiceURI))
+         || voices.find(v=>/\bava\b/i.test(v.name) && fancy(v))
+         || voices.find(v=>/\bava\b/i.test(v.name))
+         || voices.find(v=>/en[-_]US/i.test(v.lang) && fancy(v))
+         || voices.find(v=>/Samantha/i.test(v.name))
+         || voices.find(v=>/en[-_]US/i.test(v.lang)) || voices[0] || null;
+  }catch(e){}
+}
+if (window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+let lastSaid = "";
+function speak(t){
+  lastSaid = t;
+  try{
+    if(!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t.replace(/[“”"]/g,"").replace(/___/g,"blank"));
+    if(voice){ u.voice = voice; u.lang = voice.lang; }
+    u.rate = 0.92; u.pitch = 1.0;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function again(){ speak(lastSaid); }
+const sayFind = w => PARTNER[w] ? `${w}. Like this: ${info(w).s}` : w;
+const spell = w => w.split("").map(c=>c.toUpperCase()).join(", ");
+
+/* =========================================================
+   SENTENCE CHECKING
+   ========================================================= */
+const words = s => s.replace(/[^A-Za-z' ]/g," ").split(/\s+/).filter(Boolean);
+const isCVC = w => /^[bcdfghjklmnprstvwyz]?[aeiou][bdfgklmnpstxz]$/.test(lc(w));
+function allowedSet(todayWords){ return new Set([...S.mastered, ...todayWords].map(lc)); }
+function problemWords(sentence, todayWords){
+  const ok = allowedSet(todayWords);
+  return words(sentence).filter(w => !ok.has(lc(w)) && !isCVC(w));
+}
+function sentencePool(){
+  const extra = Object.values(S.custom).flatMap(c => c.read || []);
+  return [...new Set([...BANK, ...extra])];
+}
+function pickSentences(todayWords, n=3){
+  const usable = shuffle(sentencePool().filter(s => problemWords(s, todayWords).length === 0));
+  const has = (s,w) => words(s).map(lc).includes(lc(w));
+  const chosen = [];
+  shuffle(todayWords).forEach(w => { const s = usable.find(x => has(x,w) && !chosen.includes(x)); if(s) chosen.push(s); });
+  usable.filter(s => todayWords.some(w=>has(s,w)) && !chosen.includes(s)).forEach(s => { if(chosen.length < n) chosen.push(s); });
+  usable.filter(s => !chosen.includes(s)).forEach(s => { if(chosen.length < n) chosen.push(s); });
+  return shuffle(chosen.slice(0, n));
+}
+function promptFor(w){
+  const i = info(w);
+  return {word:w, p: i.p || `Write a sentence with the word "${w}". Then draw a picture!`, st: i.st || ""};
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const app = document.getElementById("app");
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const jsq = s => String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;");
+const dots = (n,on) => `<div class="dots">${Array.from({length:n},(_,i)=>`<span class="dot ${i<on?'on':''}"></span>`).join("")}</div>`;
+const topBar = (title, back="board()") => `<div class="top"><button class="iconbtn" onclick="${back}" aria-label="Back">⬅️</button><div class="t">${title}</div><button class="iconbtn" onclick="again()" aria-label="Say it again">🔊</button></div>`;
+const T = () => S.today;
+function distractors(target, n){
+  const bad = new Set([target, PARTNER[target]]);
+  const near = shuffle([...new Set([...T().words, ...S.mastered])].filter(w=>!bad.has(w)));
+  return near.slice(0, n);
+}
+function confetti(){
+  const box = document.getElementById("confetti");
+  const colors = ["#ffc93c","#e63946","#2a9d4b","#3a86ff","#ff8fab","#7b5ce0"];
+  for(let i=0;i<90;i++){
+    const d = document.createElement("div"); d.className="cf";
+    d.style.left = Math.random()*100+"vw"; d.style.background = colors[i%colors.length];
+    d.style.animationDuration = (2.2+Math.random()*2)+"s"; d.style.animationDelay = (Math.random()*0.8)+"s";
+    box.appendChild(d); setTimeout(()=>d.remove(), 5200);
+  }
+}
+function statDays(w){ return (S.stats[w] && S.stats[w].right) ? S.stats[w].right.length : 0; }
+
+/* =========================================================
+   START
+   ========================================================= */
+function start(){
+  if(!S.avatar) return pickAvatar();
+  if(S.today && S.today.date === todayStr()) return board();
+  setup();
+}
+function pickAvatar(){
+  app.innerHTML = `<h1>📚 Sight Word Adventure</h1>
+    <div class="card"><div class="ask">Pick your game piece!</div>
+    <div class="avatars">${AVATARS.map(a=>`<button onclick="setAvatar('${a}')">${a}</button>`).join("")}</div></div>`;
+  speak("Welcome to Sight Word Adventure! Pick your game piece!");
+}
+function setAvatar(a){ S.avatar = a; save(); speak("Great choice!"); setTimeout(start, 700); }
+
+/* =========================================================
+   GROWN-UP: SET UP TODAY'S LESSON
+   ========================================================= */
+let draft = null;
+function setup(){
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(!draft){
+    const sug = [...S.learning].sort((a,b)=>statDays(a)-statDays(b)).slice(0, Math.min(2, S.learning.length));
+    draft = {words: sug, warm:true, build:true, hunt:true, checkup:false};
+    draft.sentences = pickSentences(draft.words);
+    draft.prompt = draft.words.length ? promptFor(draft.words[0]) : null;
+  }
+  const since = daysSince(S.lastCheckup);
+  const checkNote = S.lastCheckup ? `Last check-up: ${since} day${since===1?"":"s"} ago.` : "No check-up yet.";
+  app.innerHTML = `
+    <h1>${S.avatar||"📚"} Today's Lesson</h1>
+    <div style="text-align:center"><span class="gtag">For grown-ups</span></div>
+    <div class="grown">
+      <h3>1. Pick today's words</h3>
+      <div class="hint">Pick 1 to 3 words she's still learning. The small number shows how many days she has read the word correctly at the end of a lesson.</div>
+      <div class="pick">${S.learning.length ? S.learning.map(w=>`<button class="${draft.words.includes(w)?'on':''}" onclick="toggleWord('${jsq(w)}')">${esc(w)}<small>${statDays(w)} day${statDays(w)===1?"":"s"} ✓</small></button>`).join("") : '<span class="hint">No learning words. Add new words on the Grown-ups page.</span>'}</div>
+    </div>
+    <div class="grown">
+      <h3>2. Today's reading sentences</h3>
+      <div class="hint">Only her mastered words, today's words, and short sound-it-out words.</div>
+      ${draft.sentences.length ? draft.sentences.map(s=>`<div class="sline">${esc(s)}</div>`).join("") : '<div class="hint">No sentences fit these words yet. You can add some on the Grown-ups page.</div>'}
+      <div class="row" style="justify-content:flex-start"><button class="btn sm white" onclick="draft.sentences=pickSentences(draft.words);setup()">🔀 Different sentences</button></div>
+    </div>
+    <div class="grown">
+      <h3>3. Writing prompt (on paper)</h3>
+      ${draft.prompt ? `<div><b>${esc(draft.prompt.p)}</b></div>${draft.prompt.st?`<div class="sline">Starter: ${esc(draft.prompt.st)}</div>`:""}` : '<div class="hint">Pick a word first.</div>'}
+      ${draft.words.length > 1 ? `<div class="row" style="justify-content:flex-start"><button class="btn sm white" onclick="nextPrompt()">🔀 Use a different word's prompt</button></div>` : ""}
+    </div>
+    <div class="grown toggles">
+      <h3>4. Extras</h3>
+      <label><input type="checkbox" ${draft.warm?'checked':''} onchange="draft.warm=this.checked"> Warm-up with words she knows</label>
+      <label><input type="checkbox" ${draft.build?'checked':''} onchange="draft.build=this.checked"> Build It (spelling with letter tiles)</label>
+      <label><input type="checkbox" ${draft.hunt?'checked':''} onchange="draft.hunt=this.checked"> Word Hunt</label>
+      <label><input type="checkbox" ${draft.checkup?'checked':''} onchange="draft.checkup=this.checked"> Mastered-words check-up (she reads all ${S.mastered.length} to you, about 3 minutes). ${checkNote}${since===null||since>=7?" <b>Due!</b>":""}</label>
+    </div>
+    <div class="row">
+      <button class="btn green huge" onclick="beginLesson()" ${draft.words.length?'':'disabled style="opacity:.5"'}>▶ Start lesson</button>
+    </div>
+    <div class="grownbar"><button onclick="grownUp()">⚙️ Words, voice, history and backup</button></div>`;
+}
+function toggleWord(w){
+  const i = draft.words.indexOf(w);
+  if(i >= 0) draft.words.splice(i,1);
+  else { if(draft.words.length >= 3) draft.words.shift(); draft.words.push(w); }
+  draft.sentences = pickSentences(draft.words);
+  draft.prompt = draft.words.length ? promptFor(draft.words.includes(draft.prompt && draft.prompt.word) ? draft.prompt.word : draft.words[0]) : null;
+  setup();
+}
+function nextPrompt(){
+  const i = draft.words.indexOf(draft.prompt.word);
+  draft.prompt = promptFor(draft.words[(i+1) % draft.words.length]);
+  setup();
+}
+function beginLesson(){
+  if(!draft.words.length) return;
+  S.today = {date: todayStr(), words:[...draft.words], sentences:[...draft.sentences], prompt:draft.prompt,
+             opts:{warm:draft.warm, build:draft.build, hunt:draft.hunt, checkup:draft.checkup}, passed:{}, results:null, writing:"", sentenceLog:[]};
+  draft = null; save();
+  board(true);
+}
+
+/* =========================================================
+   TODAY'S BOARD
+   ========================================================= */
+function stepsList(){
+  const o = T().opts, sp = [];
+  if(o.checkup) sp.push({id:"checkup", ic:"📋", nm:"Check-up", go:()=>checkup(), grown:true});
+  if(o.warm) sp.push({id:"warm", ic:"🔥", nm:"Warm-up", go:()=>hearTap("warm")});
+  sp.push({id:"meet", ic:"👀", nm:"Meet the Words", go:()=>meet(0)});
+  sp.push({id:"hear", ic:"👂", nm:"Hear and Tap", go:()=>hearTap("hear")});
+  if(o.build) sp.push({id:"build", ic:"🔤", nm:"Build It", go:()=>buildIt()});
+  if(o.hunt) sp.push({id:"hunt", ic:"🔍", nm:"Word Hunt", go:()=>wordHunt()});
+  if(T().sentences.length) sp.push({id:"read", ic:"📖", nm:"Read Sentences", go:()=>readSent(0), grown:true});
+  if(T().prompt) sp.push({id:"write", ic:"✏️", nm:"Write It", go:()=>writeIt(), grown:true});
+  sp.push({id:"boss", ic:"👑", nm:"Read It!", go:()=>boss(), grown:true});
+  sp.push({id:"done", ic:"🏆", nm:"All Done!", go:()=>lessonDone()});
+  return sp;
+}
+function board(announce){
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(!S.today || S.today.date !== todayStr()) return setup();
+  const sp = stepsList();
+  const cur = sp.findIndex(s => s.id === "done" || !T().passed[s.id]);
+  const xs = [22, 50, 78, 50];
+  const gap = 160, H = sp.length * gap;
+  const pos = sp.map((s,i)=>({x: xs[i % 4], y: i*gap + 85}));
+  const pts = pos.map(p=>`${p.x*10},${p.y}`).join(" ");
+  app.innerHTML = `
+    <div class="header">
+      <div style="font-size:22px;font-weight:600">${S.avatar} Today's words <span class="small">(tap to hear)</span></div>
+      <div class="weekwords">${T().words.map(w=>`<button class="chip" onclick="speak('${jsq(w)}. ${jsq(info(w).s)}')">${esc(w)}</button>`).join("")}</div>
+    </div>
+    <div class="board" style="height:${H}px">
+      <svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="#b8a8f0" stroke-width="14" stroke-dasharray="4 26" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+      ${sp.map((s,i)=>{
+        const done = i < cur, isCur = i === cur, locked = i > cur;
+        return `<button class="space ${done?'done':''} ${isCur?'cur':''} ${locked?'lock':''}" style="left:${pos[i].x}%;top:${pos[i].y}px" onclick="tapSpace(${i},${cur})">
+          <span class="ic">${locked?'🔒':s.ic}</span><span class="nm">${s.nm}</span>${done?'<span class="tag">⭐</span>':''}${s.grown&&!done?'<span class="tag">🧑</span>':''}</button>`;
+      }).join("")}
+      <div class="token" style="left:calc(${pos[cur].x}% + 60px);top:${pos[cur].y - 50}px">${S.avatar}</div>
+    </div>
+    <div class="row">
+      <button class="btn purple" onclick="myWords()">🫙 My Words (${S.mastered.length})</button>
+    </div>
+    <div class="grownbar"><button onclick="grownUp()">🧑 Grown-ups</button></div>`;
+  if(announce) speak(`Today's words are: ${T().words.join(", ")}. Tap the yellow space to start!`);
+}
+function tapSpace(i, cur){
+  if(i > cur){ speak("That space is locked. Finish the yellow space first!"); return; }
+  stepsList()[i].go();
+}
+function pass(id, msg){
+  const first = !T().passed[id];
+  T().passed[id] = true; save(); confetti();
+  app.innerHTML = `<div class="card pop" style="margin-top:30px">
+      <div style="font-size:100px">⭐</div><h1>Level passed!</h1>
+      <div class="sentence">${msg}</div></div>
+    <div class="row"><button class="btn green huge" onclick="board()">${first ? "Move ahead! ▶" : "Back to the board ▶"}</button></div>`;
+  speak("Level passed! " + msg.replace(/<[^>]+>/g,""));
+}
+function tryAgain(msg, retry){
+  app.innerHTML = `<div class="card pop" style="margin-top:30px">
+      <div style="font-size:100px">💪</div><h1>So close!</h1>
+      <div class="sentence">${msg}</div></div>
+    <div class="row"><button class="btn green huge" onclick="${retry}">🔁 Try again</button><button class="btn white" onclick="board()">Board</button></div>`;
+  speak("So close! " + msg + " Let's try again!");
+}
+
+/* =========================================================
+   GROWN-UP "READ IT OUT LOUD" CHECKER (check-up and final level)
+   ========================================================= */
+let rc = null;
+function readCheck(cfg){ rc = Object.assign({i:0, yes:[], no:[]}, cfg); rcShow(); speak(cfg.intro); }
+function rcShow(){
+  const w = rc.list[rc.i];
+  app.innerHTML = `${topBar(rc.title)}
+    ${rc.list.length <= 16 ? dots(rc.list.length, rc.i) : `<div class="sub small">${rc.i+1} of ${rc.list.length}</div>`}
+    <div class="card pop">
+      <span class="gtag">Grown-up: tap after she reads it</span>
+      <div class="bigword">${esc(w)}</div>
+      <div class="ask">Can you read this word?</div>
+    </div>
+    <div class="row">
+      <button class="btn green huge" onclick="rcMark(true)">✅ She read it!</button>
+      <button class="btn red huge" onclick="rcMark(false)">🔁 Not yet</button>
+    </div>`;
+}
+function rcMark(ok){
+  const w = rc.list[rc.i];
+  (ok ? rc.yes : rc.no).push(w);
+  speak(ok ? `${w}! Great reading!` : `This word is ${w}. ${info(w).s}`);
+  rc.i++;
+  setTimeout(()=>{ if(rc.i < rc.list.length) rcShow(); else rc.done(); }, ok ? 1100 : 2600);
+}
+function checkup(){
+  readCheck({title:"📋 Check-up", list:shuffle(S.mastered),
+    intro:"Check up time! Read each word to your grown up.",
+    done:()=>{
+      S.flags = [...new Set([...S.flags.filter(w=>!rc.yes.includes(w)), ...rc.no])];
+      S.lastCheckup = todayStr(); save();
+      pass("checkup", `You read <b>${rc.yes.length} of ${rc.list.length}</b> words!` + (rc.no.length ? `<div class="small" style="margin-top:8px">Grown-up: flagged for review: <span class="w">${rc.no.map(esc).join(", ")}</span></div>` : ""));
+    }});
+}
+
+/* =========================================================
+   MEET THE WORDS
+   ========================================================= */
+function meet(i){
+  const w = T().words[i], s = info(w).s;
+  app.innerHTML = `${topBar("👀 Meet the Words")}
+    ${dots(T().words.length, i+1)}
+    <div class="card pop">
+      <div class="bigword">${esc(w)}</div>
+      <div class="ask">Tap each letter!</div>
+      <div class="letters">${w.split("").map(c=>`<button class="letter" onclick="speak('${jsq(c.toUpperCase())}')">${esc(c)}</button>`).join("")}</div>
+      <div class="sentence">${esc(s).replace(new RegExp(`\\b${w}\\b`,"i"), m=>`<b>${m}</b>`)}</div>
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="${i>0?`meet(${i-1})`:'board()'}">◀ Back</button>
+      <button class="btn green huge" onclick="${i<T().words.length-1?`meet(${i+1})`:"pass('meet','You met all your new words!')"}">${i<T().words.length-1?'Next ▶':'Done! 🎉'}</button>
+    </div>`;
+  speak(`This word is ${w}. ${spell(w)}. ${w}. ${s} Now you say it: ${w}!`);
+}
+
+/* =========================================================
+   HEAR AND TAP (also the warm-up)
+   ========================================================= */
+let ht = null;
+function hearTap(mode){
+  let deck;
+  if(mode === "warm") deck = shuffle(S.mastered).slice(0,5);
+  else { deck = []; T().words.forEach(w=>deck.push(w,w,w)); deck = shuffle([...deck, ...shuffle(S.mastered).slice(0,2)]); }
+  ht = {deck, i:0, miss:0, lock:false, mode};
+  htShow();
+}
+function htShow(){
+  ht.lock = false;
+  const w = ht.deck[ht.i];
+  const opts = shuffle([w, ...distractors(w, 3)]);
+  app.innerHTML = `${topBar(ht.mode==="warm" ? "🔥 Warm-up" : "👂 Hear and Tap")}
+    ${dots(ht.deck.length, ht.i)}
+    <div class="card"><div class="ask">Listen, then tap the word!</div>
+      <button class="btn yellow" style="margin-top:10px" onclick="speak('${jsq(sayFind(w))}')">🔊 Hear the word</button></div>
+    <div class="choices">${opts.map(o=>`<button class="wc" data-w="${esc(o)}" onclick="htTap(this)">${esc(o)}</button>`).join("")}</div>`;
+  speak("Find the word: " + sayFind(w));
+}
+function htTap(el){
+  if(ht.lock) return;
+  const w = ht.deck[ht.i];
+  if(el.dataset.w === w){
+    ht.lock = true; el.classList.add("right");
+    speak(["Yes!","You got it!","Great job!","Super!"][ht.i % 4] + " " + w);
+    setTimeout(()=>{
+      ht.i++;
+      if(ht.i < ht.deck.length) return htShow();
+      if(ht.mode === "warm") return pass("warm", "Your brain is warmed up!");
+      if(ht.miss <= 2) pass("hear", "You found all the words!");
+      else tryAgain("Let's listen carefully one more time.", "hearTap('hear')");
+    }, 1300);
+  } else {
+    if(!el.classList.contains("wrong")) ht.miss++;
+    el.classList.add("wrong");
+    speak(`That says ${el.dataset.w}. Find ${sayFind(w)}`);
+  }
+}
+
+/* =========================================================
+   BUILD IT
+   ========================================================= */
+let bd = null;
+function buildIt(){
+  const rounds = [];
+  T().words.forEach(w => rounds.push({w, ghost:true}));
+  shuffle(T().words).forEach(w => rounds.push({w, ghost:false}));
+  bd = {rounds, i:0}; bdShow();
+}
+function bdShow(){
+  const r = bd.rounds[bd.i]; r.pos = 0;
+  const letters = shuffle(r.w.split(""));
+  app.innerHTML = `${topBar("🔤 Build It")}
+    ${dots(bd.rounds.length, bd.i)}
+    <div class="card pop">
+      <div class="ask">${r.ghost ? "Build the word:" : "Can you build it from memory?"}</div>
+      <div class="slots">${r.w.split("").map((c,k)=>`<div class="slot ${r.ghost?'ghost':''}" id="s${k}">${r.ghost?esc(c):''}</div>`).join("")}</div>
+      ${r.ghost ? "" : `<button class="btn white sm" onclick="peek()">👀 Peek</button>`}
+      <div class="tiles">${letters.map(c=>`<button class="tile" data-c="${esc(c)}" onclick="bdTap(this)">${esc(c)}</button>`).join("")}</div>
+    </div>`;
+  speak(`Build the word: ${r.w}. ${spell(r.w)}.`);
+}
+function peek(){
+  const r = bd.rounds[bd.i];
+  r.w.split("").forEach((c,k)=>{ const s=document.getElementById("s"+k); if(!s.classList.contains("fill")){ s.classList.add("ghost"); s.textContent=c; }});
+  speak(spell(r.w));
+  setTimeout(()=>{ r.w.split("").forEach((c,k)=>{ const s=document.getElementById("s"+k); if(s && !s.classList.contains("fill")) s.textContent=""; }); }, 2200);
+}
+function bdTap(el){
+  const r = bd.rounds[bd.i], need = r.w[r.pos];
+  if(el.dataset.c === need){
+    const s = document.getElementById("s"+r.pos);
+    s.classList.remove("ghost"); s.classList.add("fill"); s.textContent = need;
+    el.classList.add("used"); speak(need.toUpperCase()); r.pos++;
+    if(r.pos === r.w.length){
+      setTimeout(()=>speak(`${spell(r.w)}. ${r.w}! You built it!`), 500);
+      setTimeout(()=>{ bd.i++; if(bd.i < bd.rounds.length) bdShow(); else pass("build","You built all your words!"); }, 3600);
+    }
+  } else {
+    el.classList.remove("wrong"); void el.offsetWidth; el.classList.add("wrong");
+    speak(`Not that one. Find the letter ${need.toUpperCase()}`);
+  }
+}
+
+/* =========================================================
+   WORD HUNT
+   ========================================================= */
+let wh = null;
+function wordHunt(){ wh = {targets: shuffle(T().words), i:0, miss:0}; whShow(); }
+function whShow(){
+  const w = wh.targets[wh.i], count = 4;
+  const pool = distractors(w, 8), fillers = [];
+  for(let k=0;k<12-count;k++) fillers.push(pool[k % pool.length]);
+  const cards = shuffle([...Array(count).fill(w), ...fillers]);
+  wh.found = 0; wh.count = count;
+  app.innerHTML = `${topBar("🔍 Word Hunt")}
+    ${dots(wh.targets.length, wh.i)}
+    <div class="card"><div class="ask">Find every <span class="w" style="color:#e63946">${esc(w)}</span>!</div>
+      <div class="sentence" id="whc">0 of ${count} found</div></div>
+    <div class="hunt">${cards.map(c=>`<button class="wc" data-w="${esc(c)}" onclick="whTap(this)">${esc(c)}</button>`).join("")}</div>`;
+  speak(`Find every ${sayFind(w)}. There are ${count} of them!`);
+}
+function whTap(el){
+  const w = wh.targets[wh.i];
+  if(el.classList.contains("right")) return;
+  if(el.dataset.w === w){
+    el.classList.add("right"); wh.found++;
+    document.getElementById("whc").textContent = `${wh.found} of ${wh.count} found`;
+    speak(wh.found < wh.count ? `${wh.found}!` : `You found them all! ${w}!`);
+    if(wh.found === wh.count) setTimeout(()=>{
+      wh.i++;
+      if(wh.i < wh.targets.length) return whShow();
+      if(wh.miss <= 4) pass("hunt","You found every word!");
+      else tryAgain("Look carefully at each word.", "wordHunt()");
+    }, 1800);
+  } else {
+    wh.miss++;
+    el.classList.remove("wrong"); void el.offsetWidth; el.classList.add("wrong");
+    setTimeout(()=>el.classList.remove("wrong"), 450);
+    speak(`That says ${el.dataset.w}.`);
+  }
+}
+
+/* =========================================================
+   READ SENTENCES (with a grown-up)
+   ========================================================= */
+let rs = null;
+function readSent(i){
+  if(i === 0) rs = {helps:0, log:[]};
+  rs.i = i; rs.helps = 0;
+  const s = T().sentences[i];
+  const tw = new Set(T().words.map(lc));
+  const pieces = s.split(/\s+/);
+  app.innerHTML = `${topBar("📖 Read Sentences")}
+    ${dots(T().sentences.length, i)}
+    <div class="card pop">
+      <span class="gtag">Grown-up: listen while she reads</span>
+      <div class="ask" style="margin-top:10px">Read this sentence!</div>
+      <div class="sread">${pieces.map(p=>{ const clean = words(p)[0] || p; return `<button class="sw ${tw.has(lc(clean))?'tw':''}" onclick="helpWord(this,'${jsq(clean)}')">${esc(p)}</button>`; }).join("")}</div>
+      <div class="small">Stuck? Tap a word to hear it.</div>
+    </div>
+    <div class="row" id="rsr">
+      <button class="btn green huge" onclick="sentDone(true)">✅ She read it!</button>
+      <button class="btn yellow" onclick="sentDone(false)">🤝 Read it together</button>
+    </div>`;
+  speak("Read this sentence to your grown up. If you get stuck, tap a word!");
+}
+function helpWord(el, w){ if(!el.classList.contains("helped")){ rs.helps++; el.classList.add("helped"); } speak(w); }
+function sentDone(alone){
+  const s = T().sentences[rs.i];
+  T().sentenceLog.push({s, alone, helps:rs.helps}); save();
+  document.getElementById("rsr").innerHTML = `<div style="width:100%;text-align:center">
+      <div class="sentence">${alone ? (rs.helps ? "Great reading! 🌟" : "You read it all by yourself! 🌟") : "Nice teamwork! 🤝"}</div>
+      <div class="row"><button class="btn blue huge" onclick="${rs.i < T().sentences.length-1 ? `readSent(${rs.i+1})` : "pass('read','You read all your sentences!')"}">Next ▶</button></div></div>`;
+  speak((alone ? "Great reading! " : "Nice teamwork! ") + "Listen: " + s);
+}
+
+/* =========================================================
+   WRITE IT (on paper)
+   ========================================================= */
+let wchecks = {};
+function writeIt(){
+  const p = T().prompt; wchecks = {};
+  app.innerHTML = `${topBar("✏️ Write It")}
+    <div class="card pop">
+      <div class="ask">Get your paper and pencil! ✏️</div>
+      <div class="sentence" style="margin-top:14px">${esc(p.p)}</div>
+      <div class="sentence">Use the word <b>${esc(p.word)}</b>.</div>
+      ${p.st ? `<div class="starter">${esc(p.st).replace(/___/g,'<span style="color:#c9b48a">_____</span>')}</div>` : ""}
+      <div class="small">When you're done, draw a picture to go with it!</div>
+      <div class="checks">
+        <button onclick="wcheck(this,'cap')">🔠 Capital letter at the start</button>
+        <button onclick="wcheck(this,'space')">✋ Finger spaces</button>
+        <button onclick="wcheck(this,'end')">⏺️ Period at the end</button>
+      </div>
+    </div>
+    <div class="grown">
+      <span class="gtag">Grown-up (optional)</span>
+      <div class="fld"><label for="wtxt">Type what she wrote, to save it in her writing journal:</label>
+      <input type="text" id="wtxt" placeholder="Example: They are my best friends."></div>
+    </div>
+    <div class="row"><button class="btn green huge" onclick="writeDone()">✅ She wrote it!</button></div>`;
+  speak(`Writing time! Get your paper and pencil. ${p.p} Use the word ${p.word}. ${p.st ? "You can start like this: " + p.st : ""} Remember: a capital letter at the start, finger spaces, and a period at the end!`);
+}
+function wcheck(el, k){ el.classList.toggle("on"); wchecks[k] = el.classList.contains("on"); if(wchecks[k]) speak("Check!"); }
+function writeDone(){
+  T().writing = (document.getElementById("wtxt").value || "").trim(); save();
+  pass("write", "What a great writer!");
+}
+
+/* =========================================================
+   READ IT! (final check with a grown-up)
+   ========================================================= */
+function boss(){
+  const spot = shuffle(S.mastered).slice(0,3);
+  readCheck({title:"👑 Read It!", list:shuffle([...T().words, ...spot]),
+    intro:"Crown level! Read each word out loud to your grown up.",
+    done:()=>{
+      T().results = {};
+      rc.list.forEach(w => { T().results[w] = rc.yes.includes(w); });
+      T().words.forEach(w => {
+        const st = S.stats[w] || (S.stats[w] = {right:[], tries:0});
+        st.tries++;
+        if(rc.yes.includes(w) && !st.right.includes(todayStr())) st.right.push(todayStr());
+      });
+      spot.filter(w => rc.no.includes(w)).forEach(w => { if(!S.flags.includes(w)) S.flags.push(w); });
+      save();
+      pass("boss", "You read your words!");
+    }});
+}
+
+/* =========================================================
+   ALL DONE: celebration + grown-up summary
+   ========================================================= */
+function lessonDone(){
+  confetti();
+  const t = T();
+  if(!t.logged){
+    S.history.unshift({date:t.date, words:t.words, results:t.results||{}, sentences:t.sentenceLog, writing:t.writing});
+    S.history = S.history.slice(0, 60); t.logged = true; save();
+  }
+  app.innerHTML = `<div class="card pop" style="margin-top:20px">
+      <div style="font-size:100px">🏆</div><h1>Lesson complete!</h1>
+      <div class="sentence">You worked so hard today!</div></div>
+    <div class="grown">
+      <span class="gtag">Grown-up summary</span>
+      <h3 style="margin-top:10px">Today's words</h3>
+      ${t.words.map(w=>`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0">
+        <span class="w" style="font-size:28px;font-weight:700;min-width:90px">${esc(w)}</span>
+        <span>${t.results && t.results[w] ? "✅ read it today" : "🔁 not yet today"} · correct on <b>${statDays(w)}</b> day${statDays(w)===1?"":"s"}</span>
+        ${S.mastered.includes(w) ? "<b>⭐ Mastered</b>" : `<button class="btn sm green" onclick="markMastered('${jsq(w)}');lessonDone()">Mark mastered</button>`}
+      </div>`).join("")}
+      <div class="hint">Only mark a word mastered when you're confident she knows it on sight. Reading it correctly on 3 different days is a good rule of thumb.</div>
+      <h3 style="margin-top:12px">Sentences</h3>
+      ${t.sentenceLog.map(x=>`<div class="sline">${esc(x.s)} <span class="hint">· ${x.alone ? (x.helps ? `read it, tapped ${x.helps} word${x.helps===1?"":"s"} for help` : "read it on her own") : "read it together"}</span></div>`).join("") || '<div class="hint">None today.</div>'}
+      ${t.writing ? `<h3 style="margin-top:12px">Writing</h3><div class="sline">${esc(t.writing)}</div>` : ""}
+      ${t.results ? Object.keys(t.results).filter(w=>!t.words.includes(w) && !t.results[w]).map(w=>`<div class="hint">She missed known word <b>${esc(w)}</b> in the spot check. It's flagged on the Grown-ups page.</div>`).join("") : ""}
+    </div>
+    <div class="row"><button class="btn purple" onclick="myWords()">🫙 My Words</button><button class="btn white" onclick="board()">Back to the board</button></div>`;
+  speak("Lesson complete! You worked so hard today! Hi five!");
+}
+function markMastered(w){
+  S.learning = S.learning.filter(x=>x!==w);
+  if(!S.mastered.includes(w)) S.mastered.push(w);
+  S.flags = S.flags.filter(x=>x!==w);
+  save();
+}
+function moveBack(w){
+  S.mastered = S.mastered.filter(x=>x!==w);
+  if(!S.learning.includes(w)) S.learning.push(w);
+  S.flags = S.flags.filter(x=>x!==w);
+  save();
+}
+
+/* =========================================================
+   MY WORDS JAR
+   ========================================================= */
+function myWords(){
+  const back = S.today && S.today.date === todayStr() ? "board()" : "setup()";
+  app.innerHTML = `${topBar("🫙 My Words", back)}
+    <div class="card pop">
+      <h2>You know ${S.mastered.length} words!</h2>
+      <div class="small">Tap a word to hear it.</div>
+      <div class="jar">${S.mastered.map(w=>`<button class="chip" onclick="speak('${jsq(w)}')">${esc(w)}</button>`).join("")}</div>
+    </div>`;
+  speak(`You know ${S.mastered.length} words! Tap a word to hear it.`);
+}
+
+/* =========================================================
+   GROWN-UP PAGE: words, voice, history, backup
+   ========================================================= */
+let resetArmed = false;
+function grownUp(){
+  resetArmed = false;
+  const back = S.today && S.today.date === todayStr() ? "board()" : "setup()";
+  app.innerHTML = `${topBar("🧑 Grown-ups", back)}
+    <div class="grown">
+      <h3>Still learning</h3>
+      <div class="hint">Tap a word to mark it mastered.</div>
+      <div class="wl">${S.learning.map(w=>`<button style="background:#ffe9a8" onclick="markMastered('${jsq(w)}');grownUp()">${esc(w)} · ${statDays(w)}d ✓</button>`).join("") || '<span class="hint">None. Add new words below!</span>'}</div>
+      <h3 style="margin-top:12px">Mastered (${S.mastered.length})</h3>
+      <div class="hint">Pink words were missed in a check-up or spot check. Tap any word to move it back to "still learning."</div>
+      <div class="wl">${S.mastered.map(w=>`<button class="${S.flags.includes(w)?'flag':''}" onclick="moveBack('${jsq(w)}');grownUp()">${esc(w)}</button>`).join("")}</div>
+    </div>
+
+    <div class="grown">
+      <h3>Add a new word</h3>
+      <div class="fld"><label>New word</label><input type="text" id="nw" placeholder="Example: come" autocapitalize="off" autocorrect="off"></div>
+      <div class="fld"><label>Teaching sentence (the game reads this aloud)</label><input type="text" id="ns" placeholder="Example: Come and play with me!"></div>
+      <div class="fld"><label>Reading sentences she will read (optional, one per line)</label>
+        <textarea id="nr" rows="3" placeholder="Example: Come here, pup!" oninput="checkNew()"></textarea>
+        <div class="hint">Use only her mastered words, the new word, and short sound-it-out words. Any word that may be too hard gets highlighted below.</div>
+        <div id="nrchk"></div></div>
+      <div class="fld"><label>Writing prompt (optional)</label><input type="text" id="np" placeholder="Example: Who do you want to come over to play?"></div>
+      <div class="fld"><label>Sentence starter (optional)</label><input type="text" id="nst" placeholder="Example: Come and ___."></div>
+      <div class="row" style="justify-content:flex-start"><button class="btn green sm" onclick="addWord()">➕ Add word</button><span id="addmsg" class="small"></span></div>
+    </div>
+
+    <div class="grown">
+      <h3>Voice</h3>
+      <div class="hint">Now using: <b>${voice ? esc(voice.name) : "default voice"}</b>. To get Ava (Enhanced), download it in iPad Settings (search "Voices"), then close and reopen this game.</div>
+      <select id="vsel" onchange="setVoice(this.value)">
+        ${voices.map(v=>`<option value="${esc(v.voiceURI)}" ${voice && v.voiceURI===voice.voiceURI?'selected':''}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}
+      </select>
+      <div class="row" style="justify-content:flex-start"><button class="btn sm blue" onclick="speak('They said the pup is so funny!')">🔊 Test the voice</button></div>
+    </div>
+
+    <div class="grown">
+      <h3>History</h3>
+      ${S.history.length ? `<table class="hist"><tr><th>Date</th><th>Words</th><th>Writing</th></tr>
+        ${S.history.slice(0,14).map(h=>`<tr><td>${esc(h.date)}</td><td>${h.words.map(w=>`${esc(w)} ${h.results && h.results[w] ? "✅" : "🔁"}`).join(", ")}</td><td>${esc(h.writing||"")}</td></tr>`).join("")}</table>` : '<div class="hint">Finished lessons will show up here.</div>'}
+    </div>
+
+    <div class="grown">
+      <h3>Back up progress</h3>
+      <div class="hint">Progress is saved in this browser only. Always open the game from the same home screen icon. Every week or two, copy this code into your Notes app. If her progress ever disappears, paste it below and tap Restore.</div>
+      <textarea id="code" rows="3" readonly>${btoa(unescape(encodeURIComponent(JSON.stringify(S))))}</textarea>
+      <div class="row" style="justify-content:flex-start"><button class="btn sm blue" onclick="copyCode()">📋 Copy code</button></div>
+      <textarea id="restore" rows="3" placeholder="Paste a backup code here"></textarea>
+      <div class="row" style="justify-content:flex-start"><button class="btn sm green" onclick="restoreCode()">Restore</button><span id="rmsg" class="small"></span></div>
+    </div>
+
+    <div class="grown">
+      <h3>More</h3>
+      <div class="row" style="justify-content:flex-start">
+        ${S.today && S.today.date === todayStr() ? `<button class="btn sm yellow" onclick="S.today=null;save();setup()">Redo today's lesson setup</button>` : ""}
+        <button class="btn sm white" onclick="S.avatar=null;save();start()">Change game piece</button>
+        <button class="btn sm red" id="rst" onclick="resetAll()">Reset everything</button>
+      </div>
+    </div>`;
+}
+function checkNew(){
+  const w = document.getElementById("nw").value.trim();
+  const lines = document.getElementById("nr").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  document.getElementById("nrchk").innerHTML = lines.map(s=>{
+    const bad = new Set(problemWords(s, w ? [w] : []).map(lc));
+    return `<div class="sline">${s.split(/\s+/).map(p=>{ const c = lc(words(p)[0]||""); return bad.has(c) ? `<span class="bad">${esc(p)}</span>` : esc(p); }).join(" ")}</div>`;
+  }).join("") + (lines.length ? '<div class="hint">Pink = not a mastered word or a simple sound-it-out word. It\'s still allowed, but it may be too hard for her.</div>' : "");
+}
+function addWord(){
+  const w = document.getElementById("nw").value.trim();
+  const msg = document.getElementById("addmsg");
+  if(!w || /\s/.test(w)){ msg.textContent = "Type one word, with no spaces."; return; }
+  if(S.mastered.includes(w) || S.learning.includes(w)){ msg.textContent = "That word is already on her list."; return; }
+  const s = document.getElementById("ns").value.trim() || `This word is ${w}.`;
+  const read = document.getElementById("nr").value.split("\n").map(x=>x.trim()).filter(Boolean);
+  const p = document.getElementById("np").value.trim(), st = document.getElementById("nst").value.trim();
+  S.custom[w] = {s, read, p: p || undefined, st: st || undefined};
+  S.learning.push(w); save();
+  grownUp(); speak(`Added ${w}!`);
+}
+function setVoice(uri){ S.voiceURI = uri; save(); loadVoices(); speak("Hi! This is my voice. They said the pup is so funny!"); }
+function copyCode(){
+  const t = document.getElementById("code");
+  try{ navigator.clipboard.writeText(t.value).then(()=>{ document.getElementById("rmsg").textContent="Copied!"; }, ()=>t.select()); }catch(e){ t.select(); }
+}
+function restoreCode(){
+  try{
+    const obj = JSON.parse(decodeURIComponent(escape(atob(document.getElementById("restore").value.trim()))));
+    if(!Array.isArray(obj.mastered)) throw 0;
+    S = Object.assign(fresh(), obj); save(); loadVoices();
+    document.getElementById("rmsg").textContent = "Restored!"; setTimeout(start, 800);
+  }catch(e){ document.getElementById("rmsg").textContent = "That code didn't work. Check that you pasted the whole thing."; }
+}
+function resetAll(){
+  if(!resetArmed){ resetArmed = true; document.getElementById("rst").textContent = "Tap again to erase everything"; return; }
+  S = fresh(); save(); start();
+}
+
+start();
+</script>
+</body>
+</html>

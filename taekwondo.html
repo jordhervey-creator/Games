@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warrior Rules Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#fff6e5;font-family:'Fredoka',system-ui,sans-serif;color:#222;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{max-width:900px;margin:0 auto;padding:20px 20px 40px}
+h1{font-size:clamp(38px,6vw,62px);text-align:center;margin:6px 0;color:#c1121f}
+.sub{text-align:center;font-size:24px;margin:4px 0 16px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.lvl{display:flex;align-items:center;gap:14px;padding:18px;border:none;border-radius:24px;background:#fff;box-shadow:0 6px 0 #e3cfa8;font:inherit;font-size:26px;font-weight:600;text-align:left;cursor:pointer;color:#222}
+.lvl:active,.iconbtn:active,.btn:active,.area:active{transform:translateY(4px)}
+.lvl .ic{font-size:50px}
+.lvl .num{display:block;font-size:16px;color:#8a7a5a;font-weight:400}
+.lvl .st{margin-left:auto;font-size:34px}
+.lvl.test{background:#ffe08a;grid-column:1/-1;justify-content:center}
+.areas{display:grid;gap:18px}
+.area{display:flex;align-items:center;gap:18px;padding:22px 24px;border:none;border-radius:28px;font:inherit;font-size:34px;font-weight:700;text-align:left;cursor:pointer;color:#fff;box-shadow:0 7px 0 rgba(0,0,0,.2)}
+.area .ic{font-size:64px}
+.area .small{display:block;font-size:18px;font-weight:400;opacity:.95}
+.area .st{margin-left:auto;font-size:40px}
+.a-rules{background:#e63946}.a-tenets{background:#3a86ff}.a-ka{background:#2a9d4b}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.iconbtn{width:74px;height:74px;border-radius:50%;border:none;background:#fff;box-shadow:0 5px 0 #e3cfa8;font-size:36px;cursor:pointer;flex-shrink:0}
+.top .t{font-size:28px;font-weight:700;text-align:center}
+.card{background:#fff;border-radius:32px;padding:24px;text-align:center;box-shadow:0 8px 0 #e3cfa8}
+.big{font-size:clamp(110px,22vw,180px);line-height:1.1;position:relative;display:inline-block}
+.no .slash{position:absolute;right:-22%;bottom:-4%;font-size:.5em}
+.phrase{font-size:clamp(30px,4.6vw,44px);font-weight:700;margin:12px 0}
+.desc{font-size:clamp(24px,3.6vw,32px);margin:6px 0 10px;line-height:1.3}
+.chant{background:#e8f0ff;border-radius:18px;padding:12px 18px;font-size:clamp(22px,3.4vw,30px);font-weight:600;margin:8px 0;line-height:1.35}
+.badge{display:inline-block;background:#c1121f;color:#fff;border-radius:999px;padding:6px 18px;font-size:22px;font-weight:600}
+.move{display:inline-block;background:#ffe08a;border-radius:18px;padding:10px 20px;font-size:26px;margin-top:6px}
+.row{display:flex;gap:16px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.btn{border:none;border-radius:24px;padding:18px 28px;font:inherit;font-size:28px;font-weight:700;cursor:pointer;min-width:150px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.green{background:#2a9d4b;color:#fff}.red{background:#e63946;color:#fff}.yellow{background:#ffc93c;color:#222}.white{background:#fff;color:#222}.blue{background:#3a86ff;color:#fff}
+.huge{font-size:40px;padding:24px 34px;min-width:210px}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+.choice{background:#fff;border:6px solid transparent;border-radius:28px;font-size:clamp(70px,14vw,120px);padding:16px 0;cursor:pointer;box-shadow:0 6px 0 #e3cfa8;position:relative;font-family:inherit;color:#222}
+.choice .slash{position:absolute;right:12%;top:38%;font-size:.45em}
+.choice .cl{display:block;font-size:clamp(18px,2.8vw,24px);font-weight:700;margin-top:4px}
+.choice.right{border-color:#2a9d4b;background:#e5f8ea}
+.choice.wrong{opacity:.35;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.scen{font-size:clamp(28px,4.2vw,38px);font-weight:600;margin:10px 0}
+.ask{font-size:30px;color:#c1121f;font-weight:700}
+.fb{font-size:30px;font-weight:600;margin-top:14px;line-height:1.3}
+.dots{display:flex;gap:8px;justify-content:center;margin:6px 0 14px;flex-wrap:wrap}
+.dot{width:20px;height:20px;border-radius:50%;background:#e3cfa8}.dot.on{background:#ffc93c}
+.grid7{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:16px}
+.tile{background:#fff;border-radius:24px;padding:14px;min-height:175px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 0 #e3cfa8;cursor:pointer;border:5px dashed #e3cfa8;font-family:inherit;color:#222}
+.tile .q{font-size:72px;color:#c9b48a;font-weight:700;line-height:1}
+.tile .gt{font-size:15px;color:#9a8a6a;text-align:center}
+.tile.done{border:5px solid #2a9d4b;background:#e5f8ea}
+.tile .e{font-size:72px;line-height:1;position:relative}
+.tile .e .slash{position:absolute;right:-24%;bottom:-6%;font-size:.5em}
+.tile .lbl{font-size:18px;font-weight:600;text-align:center}
+.kalines{text-align:left;margin:6px auto;max-width:640px}
+.kaline{display:flex;align-items:center;gap:14px;font-size:clamp(24px,3.8vw,34px);font-weight:600;padding:8px 12px;border-radius:16px;margin:4px 0}
+.kaline .ke{font-size:1.4em;width:1.4em;text-align:center;flex-shrink:0}
+.kaline.new{background:#fff3c4}
+.kacues{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:14px 0}
+.kacue{font-size:64px;background:#fff;border:none;border-radius:22px;width:104px;height:104px;box-shadow:0 5px 0 #e3cfa8;cursor:pointer;position:relative}
+.kacue .n{position:absolute;top:4px;left:8px;font-size:16px;font-weight:700;color:#8a7a5a;font-family:'Fredoka',sans-serif}
+.blank{display:inline-block;min-width:120px;border-bottom:5px solid #c1121f;color:#2a9d4b}
+.meaning{background:#e5f8ea;border-radius:22px;padding:16px 20px;font-size:22px;line-height:1.45;margin-top:18px}
+.grown{margin-top:28px;background:#fff;border-radius:20px;padding:14px 20px;font-size:18px;line-height:1.55;user-select:text;-webkit-user-select:text}
+.grown summary{font-weight:700;cursor:pointer;font-size:20px}
+.grown li{margin-bottom:6px}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+.cf{position:absolute;top:-30px;width:14px;height:22px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(800deg)}}
+.belt{display:block;margin:4px auto 0;width:min(520px,92%)}
+.stars{text-align:center;font-size:36px;letter-spacing:6px;margin:4px 0 14px}
+.pop{animation:pop .5s}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="confetti"></div>
+<script>
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+/* Dojo rules (kid-friendly wording). She needs 7; there are 9 here "just in case". */
+const RULES = [
+  {id:"respect", e:"🙋", no:false, short:"Say “Yes sir!” and “Yes ma’am!”",
+   say:"Show respect to my teachers. Say yes sir, and yes ma'am.",
+   move:"🧍 Stand tall and say it loud!", sheet:"Rule 2", hint:"what you call your teachers"},
+  {id:"bow", e:"🙇", no:false, short:"Bow when I go in and out",
+   say:"Bow when I go in, and when I go out, of the training area.",
+   move:"🙇 Do a bow!", sheet:"Rule 3", hint:"what you do when you go in and out"},
+  {id:"time", e:"⏰", no:false, short:"Be on time for class",
+   say:"Be on time for class. If I am late, I wait at the edge in ready stance.",
+   move:"⌚ Tap your wrist like a watch!", sheet:"Rule 4", hint:"getting to class"},
+  {id:"nails", e:"✂️", no:false, short:"Keep my nails short and smooth",
+   say:"Keep my fingernails and toenails short and smooth.",
+   move:"🖐️ Wiggle your fingers and toes!", sheet:"Rule 7", hint:"your fingers and toes"},
+  {id:"jewelry", e:"💍", no:true, short:"No jewelry on the mat",
+   say:"No jewelry on the mat. No rings, necklaces, or watches.",
+   move:"👐 Show your empty hands!", sheet:"Rule 9", hint:"rings and necklaces"},
+  {id:"food", e:"🍬", no:true, short:"No food, drinks, or gum in class",
+   say:"No food, no drinks, and no gum in class.",
+   move:"🤐 Zip your lips!", sheet:"Rule 10", hint:"snacks and gum"},
+  {id:"shoes", e:"👟", no:true, short:"No shoes on the mat",
+   say:"No shoes on the mat.",
+   move:"👇 Point to your feet!", sheet:"Rule 11", hint:"your shoes and the mat"},
+  {id:"potty", e:"🚽", no:false, short:"No bare feet in the bathroom",
+   say:"No bare feet in the bathroom. Wear shoes or flip flops.",
+   move:"🩴 Stomp like you have flip-flops on!", sheet:"Rule 12", hint:"the bathroom"},
+  {id:"horse", e:"🤼", no:true, short:"No horseplay or play-fighting",
+   say:"No horseplay. No play fighting in class.",
+   move:"🗿 Freeze like a statue!", sheet:"Rule 15", hint:"play fighting"}
+];
+const RULES_GOAL = 7;
+
+const STORIES = [
+  {r:"bow", e:"🙇‍♀️", ok:true,  t:"Lily bows before she steps onto the mat."},
+  {r:"bow", e:"🏃", ok:false, t:"Sam runs onto the mat and forgets to bow."},
+  {r:"respect", e:"🙋‍♀️", ok:true, t:"Her teacher asks Ava a question. Ava says, “Yes ma’am!”"},
+  {r:"respect", e:"🤷‍♂️", ok:false, t:"His teacher talks to Ben, and Ben just says, “Yeah.”"},
+  {r:"time", e:"⏰", ok:true, t:"Mia gets to class early and is ready to go."},
+  {r:"time", e:"🏃‍♂️", ok:false, t:"Leo is late, and he runs right into class without waiting."},
+  {r:"nails", e:"✂️", ok:true, t:"Zoe trimmed her fingernails and toenails before class."},
+  {r:"nails", e:"🖐️", ok:false, t:"Max comes to class with long, scratchy fingernails."},
+  {r:"jewelry", e:"💍", ok:false, t:"Lucy wears her sparkly ring on the mat."},
+  {r:"jewelry", e:"📿", ok:true, t:"Eli takes off his necklace and puts it in his bag before class."},
+  {r:"food", e:"🍬", ok:false, t:"Ella is chewing gum during class."},
+  {r:"food", e:"🎒", ok:true, t:"Noah keeps his snack in his bag until class is over."},
+  {r:"shoes", e:"👟", ok:false, t:"Jack walks onto the mat wearing his sneakers."},
+  {r:"shoes", e:"🧦", ok:true, t:"Ruby takes off her shoes before she steps on the mat."},
+  {r:"potty", e:"🦶", ok:false, t:"Kai walks into the bathroom with bare feet."},
+  {r:"potty", e:"🩴", ok:true, t:"Nora puts on her flip-flops before she goes to the bathroom."},
+  {r:"horse", e:"🤼", ok:false, t:"Two friends start play-fighting while they wait in line."},
+  {r:"horse", e:"🧍", ok:true, t:"Owen keeps his hands to himself and listens."}
+];
+const WHY = {
+  bow:"We bow when we go in and out!",
+  respect:"We say “Yes sir” and “Yes ma’am” to our teachers!",
+  time:"We come on time. If we are late, we wait at the edge until the teacher says come in.",
+  nails:"We keep our nails short and smooth so nobody gets scratched.",
+  jewelry:"No jewelry on the mat, so nobody gets hurt!",
+  food:"No food, drinks, or gum in class!",
+  shoes:"No shoes on the mat!",
+  potty:"We wear shoes or flip-flops in the bathroom. No bare feet!",
+  horse:"No horseplay or play-fighting in class!"
+};
+
+/* 5 Tenets */
+const TENETS = [
+  {id:"courtesy", e:"🤝", word:"Courtesy",
+   desc:"Being kind and polite to everyone.",
+   say:"Courtesy means being kind and polite to everyone. Say please, and thank you!",
+   move:"🙇 Bow and say “thank you!”", hint:"being kind and polite"},
+  {id:"integrity", e:"😇", word:"Integrity",
+   desc:"Telling the truth and doing the right thing, even when no one is watching.",
+   say:"Integrity means telling the truth, and doing the right thing, even when no one is watching.",
+   move:"✋ Put your hand on your heart!", hint:"telling the truth"},
+  {id:"perseverance", e:"💪", word:"Perseverance",
+   desc:"Never give up! Keep trying, even when it's hard.",
+   say:"Perseverance means never give up! Keep trying, even when it's hard.",
+   move:"💪 Make strong arms and say “I won't give up!”", hint:"never giving up"},
+  {id:"selfcontrol", e:"🧘", word:"Self-Control",
+   desc:"Making good choices with my body, even when I feel mad or silly.",
+   chant:"“I'm in charge of me! My hands, my feet, my whole body, I'm in charge of me!”",
+   say:"Self control means making good choices with my body, even when I feel mad or silly. I'm in charge of me! My hands, my feet, my whole body, I'm in charge of me!",
+   move:"👐 Point to your hands, your feet, and your whole body!", hint:"being in charge of me"},
+  {id:"spirit", e:"🦁", word:"Indomitable Spirit",
+   desc:"Having a brave, strong heart. I believe in myself, even when I feel scared!",
+   say:"Indomitable spirit means having a brave, strong heart. I believe in myself, even when I feel scared!",
+   move:"🦁 Stand tall and roar like a brave lion!", hint:"a brave, strong heart"}
+];
+const TSTORIES = [
+  {id:"courtesy", t:"Leo says “please” and “thank you” to his teacher."},
+  {id:"courtesy", t:"Ava holds the door open for her friend."},
+  {id:"integrity", t:"Sam broke a toy. He tells the truth and says, “I did it. I'm sorry.”"},
+  {id:"integrity", t:"Zoe does all of her jumping jacks, even when nobody is watching."},
+  {id:"perseverance", t:"Mia's kick is hard to do. She keeps trying, again and again!"},
+  {id:"perseverance", t:"Ben falls down, gets back up, and tries again."},
+  {id:"selfcontrol", t:"Owen feels mad, but he keeps his hands to himself."},
+  {id:"selfcontrol", t:"Ella wants to talk, but she waits quietly for her turn."},
+  {id:"spirit", t:"Ruby feels nervous at her belt test, but she is brave and does her best!"},
+  {id:"spirit", t:"Noah feels a little scared, but he stands tall and says, “I can do it!”"}
+];
+
+/* Essence of Ka */
+const KA = [
+  {e:"🥋", t:"Ka.", b:"___.", w:"Ka"},
+  {e:"❓", t:"What is the meaning of Ka?", b:"What is the meaning of ___?", w:"Ka"},
+  {e:"⭕", t:"The meaning of the word Ka, is empty.", b:"The meaning of the word Ka, is ___.", w:"empty"},
+  {e:"🧠", t:"The minds of those who study karate", b:"The minds of those who study ___", w:"karate"},
+  {e:"🚫", t:"should be empty of all evil or selfish thoughts.", b:"should be empty of all evil or ___ thoughts.", w:"selfish"},
+  {e:"🙌", t:"As are the hands.", b:"As are the ___.", w:"hands"}
+];
+const KA_MEANING = "Ka means empty. A good warrior keeps mean and selfish thoughts out of her mind. And her hands are empty too: she uses them to help, not to hurt.";
+
+/* =========================================================
+   PROGRESS (saved on this device)
+   ========================================================= */
+let prog = {};
+try{ const s = localStorage.getItem("warriorRules_v2"); if(s) prog = JSON.parse(s) || {}; }catch(e){}
+function save(){ try{ localStorage.setItem("warriorRules_v2", JSON.stringify(prog)); }catch(e){} }
+const allFinals = () => !!(prog["rules-final"] && prog["tenets-final"] && prog["ka-final"]);
+
+/* =========================================================
+   TALKING
+   ========================================================= */
+let voice = null;
+function pickVoice(){
+  try{
+    const vs = speechSynthesis.getVoices();
+    voice = vs.find(v=>/en[-_]US/i.test(v.lang) && /Samantha|Nicky|Karen|Google US/i.test(v.name))
+         || vs.find(v=>/en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+  }catch(e){}
+}
+if (window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+let lastSaid = "";
+function speak(t){
+  lastSaid = t;
+  try{
+    if(!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const said = t.replace(/[“”]/g,"").replace(/’/g,"'")
+      .replace(/\bbows\b/gi,"boughs").replace(/\bbow\b/gi,"bough")   // say "bow" like "cow"
+      .replace(/\bKa\b/g,"Kah")                                       // say "Ka" as "kah"
+      .replace(/___/g,"hmmm");
+    const u = new SpeechSynthesisUtterance(said);
+    if(voice) u.voice = voice;
+    u.rate = 0.88; u.pitch = 1.1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function again(){ speak(lastSaid); }
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const app = document.getElementById("app");
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pic = (r, cls="big") => `<span class="${cls} ${r.no?'no':''}">${r.e}${r.no?'<span class="slash">🚫</span>':''}</span>`;
+let backTo = () => home();
+const topBar = (title) => `<div class="top"><button class="iconbtn" onclick="backTo()" aria-label="Back">⬅️</button><div class="t">${title}</div><button class="iconbtn" onclick="again()" aria-label="Say it again">🔊</button></div>`;
+const dots = (n, on) => `<div class="dots">${Array.from({length:n},(_,i)=>`<span class="dot ${i<on?'on':''}"></span>`).join("")}</div>`;
+const star = key => prog[key] ? "⭐" : "";
+
+function beltSVG(tip){
+  const tipFill = tip ? "#ffc93c" : "#ffffff";
+  const dash = tip ? "" : 'stroke-dasharray="8 6"';
+  return `<svg class="belt" viewBox="0 0 520 120" aria-label="white belt${tip?' with yellow tip':''}">
+    <rect x="8" y="34" width="504" height="40" rx="8" fill="#fff" stroke="#333" stroke-width="3"/>
+    <rect x="440" y="34" width="72" height="40" rx="6" fill="${tipFill}" stroke="#333" stroke-width="3" ${dash}/>
+    <rect x="8" y="34" width="72" height="40" rx="6" fill="${tipFill}" stroke="#333" stroke-width="3" ${dash}/>
+    <polygon points="238,74 205,116 240,116 258,82" fill="#fff" stroke="#333" stroke-width="3"/>
+    <polygon points="282,74 315,116 280,116 262,82" fill="#fff" stroke="#333" stroke-width="3"/>
+    <rect x="226" y="24" width="68" height="60" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  </svg>`;
+}
+
+/* =========================================================
+   HOME + HUBS
+   ========================================================= */
+function home(){
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const trophies = ["rules","tenets","ka"].map(a=>prog[a+"-final"]?"🏆":"☆").join(" ");
+  app.innerHTML = `
+    <h1>🥋 Warrior Training</h1>
+    ${beltSVG(allFinals())}
+    <div class="stars">${trophies}</div>
+    <p class="sub">Win all 3 trophies to fill in your yellow tip!</p>
+    <div class="areas">
+      <button class="area a-rules" onclick="hub('rules')"><span class="ic">🥋</span><span>Dojo Rules<span class="small">Learn the rules of class</span></span><span class="st">${prog["rules-final"]?"🏆":""}</span></button>
+      <button class="area a-tenets" onclick="hub('tenets')"><span class="ic">🖐️</span><span>5 Tenets<span class="small">Courtesy, Integrity, and more</span></span><span class="st">${prog["tenets-final"]?"🏆":""}</span></button>
+      <button class="area a-ka" onclick="hub('ka')"><span class="ic">🙌</span><span>Essence of Ka<span class="small">What is the meaning of Ka?</span></span><span class="st">${prog["ka-final"]?"🏆":""}</span></button>
+    </div>
+    <details class="grown"><summary>For grown-ups: how to use this</summary>
+      <p>Everything is read out loud, so she doesn't need to read. Turn the volume up and make sure the iPad isn't on silent. Tap 🔊 to hear something again and ⬅️ to go back.</p>
+      <p><b>Dojo Rules:</b> 9 rules from the Freedom Martial Arts sheet (rules 2, 3, 4, 7, 9, 10, 11, 12, and 15). She only needs 7, so the Belt Test is passed once she says any 7.</p>
+      <p><b>5 Tenets:</b> she only has to say the words, but the game teaches what each one means with simple stories.</p>
+      <p><b>Essence of Ka:</b> learned line by line, then with fill-in-the-blank, then the whole thing.</p>
+      <p>The last level in each section is the "say it out loud" challenge. That's closest to the real test, so it's the most important one to repeat. A few minutes a day works better than one long session.</p>
+      <p><a href="#" onclick="resetProg();return false;">Reset all stars and trophies</a></p>
+    </details>`;
+}
+function resetProg(){ prog = {}; save(); home(); }
+
+const HUBS = {
+  rules:{title:"🥋 Dojo Rules", sub:"Learn your dojo rules!", levels:[
+      {ic:"📖", name:"Learn the Rules", go:()=>learnRules(0)},
+      {ic:"👍", name:"Thumbs Up or Down", go:()=>thumbs()},
+      {ic:"🔍", name:"Find the Picture", go:()=>matchRules()},
+      {ic:"🗣️", name:"Say It!", go:()=>sayIt()}],
+    final:{ic:"🥋", name:"Belt Test!", go:()=>rulesTest()}},
+  tenets:{title:"🖐️ 5 Tenets", sub:"The 5 tenets of taekwondo!", levels:[
+      {ic:"📖", name:"Learn the Tenets", go:()=>learnTenets(0)},
+      {ic:"🤔", name:"Which Tenet Is It?", go:()=>matchTenets()}],
+    final:{ic:"🏅", name:"Say All 5!", go:()=>tenetsTest()}},
+  ka:{title:"🙌 Essence of Ka", sub:"What is the meaning of Ka?", levels:[
+      {ic:"👂", name:"Listen and Repeat", go:()=>kaBuild(1)},
+      {ic:"🧩", name:"Fill in the Blank", go:()=>kaBlank(0)}],
+    final:{ic:"🎤", name:"Say It All!", go:()=>kaRecite()}}
+};
+function hub(area){
+  try{ speechSynthesis.cancel(); }catch(e){}
+  backTo = () => home();
+  const h = HUBS[area];
+  app.innerHTML = `
+    <div class="top"><button class="iconbtn" onclick="home()" aria-label="Home">🏠</button><div class="t">${h.title}</div><span style="width:74px"></span></div>
+    <p class="sub">${h.sub}</p>
+    <div class="levels">
+      ${h.levels.map((l,i)=>`<button class="lvl" onclick="HUBS.${area}.levels[${i}].go()"><span class="ic">${l.ic}</span><span><span class="num">Level ${i+1}</span>${l.name}</span><span class="st">${star(area+"-"+i)}</span></button>`).join("")}
+      <button class="lvl test" onclick="HUBS.${area}.final.go()"><span class="ic">${h.final.ic}</span><span><span class="num">Final level</span>${h.final.name}</span><span class="st">${prog[area+"-final"]?"🏆":""}</span></button>
+    </div>
+    ${area==="ka" ? `<div class="meaning"><b>What does it mean?</b> ${KA_MEANING}</div>` : ""}`;
+}
+
+/* =========================================================
+   DOJO RULES LEVELS
+   ========================================================= */
+function learnRules(i){
+  backTo = () => hub("rules");
+  const r = RULES[i], n = RULES.length;
+  app.innerHTML = `${topBar("📖 Learn the Rules")}
+    ${dots(n, i+1)}
+    <div class="card pop">
+      <span class="badge">Rule ${i+1} of ${n}</span><br>
+      ${pic(r)}
+      <div class="phrase">${r.short}</div>
+      <div class="move">Do the move: ${r.move}</div>
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="${i>0?`learnRules(${i-1})`:'hub(\'rules\')'}">◀ Back</button>
+      <button class="btn green huge" onclick="${i<n-1?`learnRules(${i+1})`:"finish('rules-0','You learned all the rules!',()=>learnRules(0),'rules')"}">${i<n-1?'Next ▶':'Done! 🎉'}</button>
+    </div>`;
+  speak(`Rule ${i+1}. ${r.say} Now do the move! ${r.move.replace(/^\S+\s/,"")}`);
+}
+
+let tDeck=[], tIdx=0, tScore=0;
+function thumbs(){ backTo = () => hub("rules"); tDeck = shuffle(STORIES).slice(0,8); tIdx=0; tScore=0; thumbsShow(); }
+function thumbsShow(){
+  const s = tDeck[tIdx];
+  app.innerHTML = `${topBar("👍 Thumbs Up or Down")}
+    ${dots(8, tIdx)}
+    <div class="card pop">
+      <span class="big">${s.e}</span>
+      <div class="scen">${s.t}</div>
+      <div class="ask">Is that a good warrior?</div>
+    </div>
+    <div class="row" id="ans">
+      <button class="btn green huge" onclick="thumbsAns(true)">👍 Yes!</button>
+      <button class="btn red huge" onclick="thumbsAns(false)">👎 Oops!</button>
+    </div>`;
+  speak(s.t + " Is that a good warrior? Thumbs up, or thumbs down?");
+}
+function thumbsAns(said){
+  const s = tDeck[tIdx]; const right = said===s.ok; if(right) tScore++;
+  const msg = right ? (s.ok ? "Yes! Good warrior!" : "Right! That's an oops!") : "Hmm, let's think again.";
+  document.getElementById("ans").innerHTML = `
+    <div style="width:100%;text-align:center">
+      <div class="fb pop">${right?"✅":"🤔"} ${msg}<br>${WHY[s.r]}</div>
+      <div class="row"><button class="btn blue huge" onclick="thumbsNext()">Next ▶</button></div>
+    </div>`;
+  speak(msg + " " + WHY[s.r]);
+}
+function thumbsNext(){ tIdx++; if(tIdx<tDeck.length) thumbsShow(); else finish("rules-1", `You got ${tScore} out of 8!`, thumbs, "rules"); }
+
+/* Generic "tap the right picture" game, used by Dojo Rules and Tenets */
+let mg = null;
+function pickGame(cfg){ mg = Object.assign({idx:0, lock:false}, cfg); pickShow(); }
+function pickShow(){
+  mg.lock = false;
+  const q = mg.deck[mg.idx];
+  const right = mg.pool.find(p=>p.id===q.id);
+  const opts = shuffle([right, ...shuffle(mg.pool.filter(p=>p.id!==q.id)).slice(0,2)]);
+  app.innerHTML = `${topBar(mg.title)}
+    ${dots(mg.deck.length, mg.idx)}
+    <div class="card pop"><div class="ask">${mg.ask}</div><div class="${mg.labels?'scen':'phrase'}">${q.text}</div></div>
+    <div class="choices">${opts.map(o=>`<button class="choice" data-id="${o.id}" onclick="pickTap(this)">${o.e}${o.no?'<span class="slash">🚫</span>':''}${mg.labels?`<span class="cl">${o.word}</span>`:''}</button>`).join("")}</div>`;
+  speak(mg.spokenAsk(q));
+}
+function pickTap(el){
+  if(mg.lock) return;
+  const q = mg.deck[mg.idx];
+  if(el.dataset.id===q.id){
+    mg.lock = true; el.classList.add("right");
+    speak(mg.yes(q));
+    setTimeout(()=>{ mg.idx++; if(mg.idx<mg.deck.length) pickShow(); else mg.done(); }, mg.wait || 1900);
+  } else {
+    el.classList.add("wrong");
+    const w = mg.pool.find(p=>p.id===el.dataset.id);
+    speak(mg.labels ? `That one is ${w.word}. Try again!` : "Try again!");
+  }
+}
+function matchRules(){
+  backTo = () => hub("rules");
+  pickGame({title:"🔍 Find the Picture", ask:"Find the picture for:", pool:RULES,
+    deck: shuffle(RULES).map(r=>({id:r.id, text:r.short, say:r.say})),
+    spokenAsk:q=>"Find the picture for: " + q.say,
+    yes:q=>"Yes! " + q.text,
+    done:()=>finish("rules-2","You found every picture!",matchRules,"rules")});
+}
+
+let sQueue=[], sDone=0;
+function sayIt(){ backTo = () => hub("rules"); sQueue = shuffle(RULES); sDone=0; sayShow(); }
+function sayShow(){
+  const r = sQueue[0];
+  app.innerHTML = `${topBar("🗣️ Say It!")}
+    ${dots(RULES.length, sDone)}
+    <div class="card pop">
+      ${pic(r)}
+      <div class="ask">Can you say this rule?</div>
+      <div class="phrase" id="reveal" style="visibility:hidden">${r.short}</div>
+    </div>
+    <div class="row">
+      <button class="btn yellow" onclick="sayHint()">💡 Help</button>
+      <button class="btn green huge" onclick="sayGot()">✅ I said it!</button>
+      <button class="btn white" onclick="sayLater()">🔁 Later</button>
+    </div>`;
+  speak("Look at the picture. Can you say this rule to your grown up?");
+}
+function sayHint(){ document.getElementById("reveal").style.visibility="visible"; speak(sQueue[0].say); }
+function sayGot(){ sQueue.shift(); sDone++; if(sQueue.length){ speak("Hi-yah! Great job!"); setTimeout(sayShow, 900); } else finish("rules-3",`You said all ${RULES.length} rules!`,sayIt,"rules"); }
+function sayLater(){ sQueue.push(sQueue.shift()); sayShow(); }
+
+/* Generic "say them from memory" test: grown-up taps each one she says */
+let tt = null;
+function tileTest(cfg){ tt = Object.assign({said:new Set()}, cfg); tileDraw(); speak(cfg.intro); }
+function tileDraw(){
+  app.innerHTML = `${topBar(tt.title)}
+    <div class="card"><div class="ask">${tt.ask}</div>
+      <div class="phrase" style="font-size:28px">${tt.said.size} of ${tt.goal} ⭐</div>
+      <div style="font-size:16px;color:#8a7a5a">Grown-up: tap a box when she says that one.</div>
+    </div>
+    <div class="grid7">${tt.items.map(r=> tt.said.has(r.id)
+      ? `<div class="tile done">${pic(r,"e")}<div class="lbl">${tt.label(r)}</div></div>`
+      : `<button class="tile" onclick="tileTap('${r.id}')"><div class="q">?</div><div class="gt">${tt.label(r)}</div></button>`).join("")}
+    </div>
+    <div class="row"><button class="btn yellow" onclick="tileHint()">💡 Need a hint?</button></div>`;
+}
+function tileTap(id){
+  tt.said.add(id);
+  if(tt.said.size >= tt.goal){ tt.done(); return; }
+  tileDraw();
+  speak(["Hi-yah!","Yes!","Awesome!","Keep going!","Great job!"][tt.said.size % 5] + ` That's ${tt.said.size}!`);
+}
+function tileHint(){
+  const left = tt.items.filter(r=>!tt.said.has(r.id));
+  const r = tt.inOrder ? left[0] : left[Math.floor(Math.random()*left.length)];
+  speak(tt.hintText(r));
+}
+function rulesTest(){
+  backTo = () => hub("rules");
+  tileTest({title:"🥋 Belt Test", items:RULES, goal:RULES_GOAL, ask:`Say ${RULES_GOAL} dojo rules!`,
+    label:r=>r.short,
+    intro:`Belt test time! Tell your grown up ${RULES_GOAL} dojo rules. You can say them in any order. Ready, warrior? Go!`,
+    hintText:r=>"Here's a hint. One rule is about " + r.hint + ".",
+    done:()=>finish("rules-final", `You said ${RULES_GOAL} dojo rules! You know your rules!`, rulesTest, "rules", true)});
+}
+
+/* =========================================================
+   5 TENETS LEVELS
+   ========================================================= */
+function learnTenets(i){
+  backTo = () => hub("tenets");
+  const t = TENETS[i];
+  app.innerHTML = `${topBar("📖 Learn the Tenets")}
+    ${dots(5, i+1)}
+    <div class="card pop">
+      <span class="badge">Tenet ${i+1} of 5</span><br>
+      <span class="big">${t.e}</span>
+      <div class="phrase">${i+1}. ${t.word}</div>
+      <div class="desc">${t.desc}</div>
+      ${t.chant ? `<div class="chant">${t.chant}</div>` : ""}
+      <div class="move">Do the move: ${t.move}</div>
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="${i>0?`learnTenets(${i-1})`:'hub(\'tenets\')'}">◀ Back</button>
+      <button class="btn green huge" onclick="${i<4?`learnTenets(${i+1})`:"finish('tenets-0','You learned all 5 tenets!',()=>learnTenets(0),'tenets')"}">${i<4?'Next ▶':'Done! 🎉'}</button>
+    </div>`;
+  speak(`Tenet number ${i+1}. ${t.word}. ${t.say} Now do the move! ${t.move.replace(/^\S+\s/,"")}`);
+}
+function matchTenets(){
+  backTo = () => hub("tenets");
+  pickGame({title:"🤔 Which Tenet Is It?", ask:"Which tenet is this?", pool:TENETS, labels:true, wait:2600,
+    deck: shuffle(TSTORIES).slice(0,6).map(s=>({id:s.id, text:s.t})),
+    spokenAsk:q=>q.text + " Which tenet is that?",
+    yes:q=>{ const t = TENETS.find(x=>x.id===q.id); return `Yes! That's ${t.word}! ${t.desc}`; },
+    done:()=>finish("tenets-1","You know what the tenets mean!",matchTenets,"tenets")});
+}
+function tenetsTest(){
+  backTo = () => hub("tenets");
+  tileTest({title:"🏅 Say All 5!", items:TENETS, goal:5, inOrder:true, ask:"Say the 5 tenets!",
+    label:t=>t.word,
+    intro:"Can you say all 5 tenets of taekwondo? Start with number 1. Ready, warrior? Go!",
+    hintText:t=>"Here's a hint. This one means " + t.hint + ".",
+    done:()=>finish("tenets-final","You said all 5 tenets!",tenetsTest,"tenets",true)});
+}
+
+/* =========================================================
+   ESSENCE OF KA LEVELS
+   ========================================================= */
+function kaBuild(k){
+  backTo = () => hub("ka");
+  const shown = KA.slice(0,k);
+  app.innerHTML = `${topBar("👂 Listen and Repeat")}
+    ${dots(KA.length, k)}
+    <div class="card pop">
+      <div class="ask">Listen, then say it with me!</div>
+      <div class="kalines">${shown.map((l,i)=>`<div class="kaline ${i===k-1?'new':''}"><span class="ke">${l.e}</span>${l.t}</div>`).join("")}</div>
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="${k>1?`kaBuild(${k-1})`:'hub(\'ka\')'}">◀ Back</button>
+      <button class="btn green huge" onclick="${k<KA.length?`kaBuild(${k+1})`:"finish('ka-0','You learned the whole Essence of Ka!',()=>kaBuild(1),'ka')"}">${k<KA.length?'✅ I said it!':'Done! 🎉'}</button>
+    </div>`;
+  speak("Listen. " + shown.map(l=>l.t).join(" ") + " ... Now you say it!");
+}
+function kaBlank(i){
+  backTo = () => hub("ka");
+  const l = KA[i];
+  app.innerHTML = `${topBar("🧩 Fill in the Blank")}
+    ${dots(KA.length, i+1)}
+    <div class="card pop">
+      <span class="big">${l.e}</span>
+      <div class="ask">What's the missing word?</div>
+      <div class="phrase" id="kab">${l.b.replace("___",'<span class="blank">&nbsp;</span>')}</div>
+    </div>
+    <div class="row" id="kar">
+      <button class="btn yellow huge" onclick="kaReveal(${i})">👀 Show me!</button>
+    </div>`;
+  speak((i===0 ? "The Essence of Ka starts with one special word. " : "") + l.b + " What's the missing word?");
+}
+function kaReveal(i){
+  const l = KA[i];
+  document.getElementById("kab").innerHTML = l.b.replace("___",`<span class="blank">${l.w}</span>`);
+  document.getElementById("kar").innerHTML = `<button class="btn green huge" onclick="${i<KA.length-1?`kaBlank(${i+1})`:"finish('ka-1','You filled in every blank!',()=>kaBlank(0),'ka')"}">${i<KA.length-1?'Next ▶':'Done! 🎉'}</button>`;
+  speak(l.t);
+}
+let kaHide = false;
+function kaRecite(){
+  backTo = () => hub("ka");
+  app.innerHTML = `${topBar("🎤 Say It All!")}
+    <div class="card pop">
+      <div class="ask">Say the whole Essence of Ka!</div>
+      <div style="font-size:18px;color:#8a7a5a;margin-top:6px">${kaHide?"No picture clues. You can do it!":"Stuck? Tap a picture to hear that line."}</div>
+      <div class="kacues">${KA.map((l,i)=>`<button class="kacue" onclick="speak(KA[${i}].t)"><span class="n">${i+1}</span>${kaHide?"❔":l.e}</button>`).join("")}</div>
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="kaHide=!kaHide;kaRecite()">${kaHide?"🖼️ Show pictures":"🙈 Hide pictures"}</button>
+      <button class="btn blue" onclick="speak(KA.map(l=>l.t).join(' '))">🔊 Hear it all</button>
+      <button class="btn green huge" onclick="finish('ka-final','You said the whole Essence of Ka!',kaRecite,'ka',true)">✅ I said it all!</button>
+    </div>`;
+  speak("Can you say the whole Essence of Ka to your grown up? Ready, warrior? Go!");
+}
+
+/* =========================================================
+   CELEBRATE
+   ========================================================= */
+function confetti(){
+  const box = document.getElementById("confetti");
+  const colors = ["#ffc93c","#e63946","#2a9d4b","#3a86ff","#ff8fab","#222"];
+  for(let i=0;i<90;i++){
+    const d = document.createElement("div");
+    d.className="cf";
+    d.style.left = Math.random()*100+"vw";
+    d.style.background = colors[i%colors.length];
+    d.style.animationDuration = (2.2+Math.random()*2)+"s";
+    d.style.animationDelay = (Math.random()*0.8)+"s";
+    box.appendChild(d);
+    setTimeout(()=>d.remove(), 5200);
+  }
+}
+let replayFn = null;
+function finish(key, line, replay, area, isFinal=false){
+  const hadTip = allFinals();
+  prog[key] = true; save(); confetti();
+  replayFn = replay;
+  const tipNow = !hadTip && allFinals();
+  let title, extra;
+  if(tipNow){
+    title = "YELLOW TIP!";
+    line = "You won all 3 trophies! You know your rules, your tenets, and the Essence of Ka. You're ready for your yellow tip!";
+    extra = beltSVG(true);
+  } else if(isFinal){
+    title = "You won a trophy!";
+    const left = 3 - ["rules","tenets","ka"].filter(a=>prog[a+"-final"]).length;
+    extra = `<div class="stars">🏆</div>` + (left>0 && !allFinals() ? `<div class="desc">${left} more ${left===1?"trophy":"trophies"} to get your yellow tip!</div>` : "");
+  } else {
+    title = "Hi-yah! Level done!";
+    extra = `<div class="stars">You earned a ⭐</div>`;
+  }
+  app.innerHTML = `
+    <div class="card pop" style="margin-top:30px">
+      <div class="big">${tipNow||isFinal?"🏆":"🎉"}</div>
+      <h1>${title}</h1>
+      <div class="phrase">${line}</div>
+      ${extra}
+    </div>
+    <div class="row">
+      <button class="btn white" onclick="replayFn()">🔁 Play again</button>
+      <button class="btn green huge" onclick="hub('${area}')">⬅️ Back</button>
+    </div>`;
+  speak(title.replace(/!/g,"!") + " " + line + (extra.includes("more troph") ? " " + extra.replace(/<[^>]+>/g," ").replace("🏆","") : ""));
+}
+
+home();
+</script>
+</body>
+</html>
